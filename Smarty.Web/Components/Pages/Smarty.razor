@@ -1,0 +1,41 @@
+﻿@page "/smarty"
+@using SmartyStreets.USStreetApi
+@using ZipCodeBatch = SmartyStreets.USZipCodeApi.Batch
+
+@inject SmartyApiClient SmartyApiClient
+
+<h3>Smarty</h3>
+
+Single Address:
+<p>
+    @SingleAddress
+</p>
+
+<input type="text" id="zipcode" class="form-control" placeholder="Enter Zipcode" />
+
+List of Counties based on Zipcode entered:
+@if (ZipCodeAddress.Any())
+{
+    <ul class="list-group">
+        @foreach (var address in ZipCodeAddress)
+        {
+            @foreach (var zipcode in address.Result.ZipCodes)
+            {
+                <li class="list-group-item">@zipcode.CountyName</li>
+            }
+        }
+    </ul>
+}
+    
+
+
+@code {
+    public List<Candidate> SingleAddress { get; set; }
+    public ZipCodeBatch ZipCodeAddress { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        SingleAddress = await SmartyApiClient.GetSingleAddressAsync();
+        ZipCodeAddress = await SmartyApiClient.GetZipCodeAddressAsync();
+    }
+}
